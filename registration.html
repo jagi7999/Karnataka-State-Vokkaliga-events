@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>28ನೇ ವಾರ್ಷಿಕೋತ್ಸವ - Event Registration</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<style>
+:root{
+  --bg:#e6e9ef;
+  --shadow-light:#ffffff;
+  --shadow-dark:#b8bcc4;
+  --accent:#8a1c2c;
+  --accent2:#c99a2e;
+  --text:#2b2b2b;
+  --success:#1f8a4c;
+  --danger:#b02a2a;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Segoe UI',Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+.header{
+  background:linear-gradient(135deg,var(--accent),#5e1220);
+  color:#fff;
+  padding:18px 16px;
+  text-align:center;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+}
+.header h1{margin:0;font-size:1.15rem;}
+.header p{margin:4px 0 0;font-size:0.8rem;opacity:0.9;}
+.nav{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+  padding:14px;
+  background:var(--bg);
+}
+.nav button{
+  border:none;
+  background:var(--bg);
+  padding:10px 18px;
+  border-radius:12px;
+  box-shadow:6px 6px 12px var(--shadow-dark),-6px -6px 12px var(--shadow-light);
+  cursor:pointer;
+  font-weight:600;
+  color:var(--accent);
+  font-size:0.85rem;
+  transition:0.15s;
+}
+.nav button.active{
+  box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light);
+  color:var(--accent2);
+}
+.container{max-width:700px;margin:0 auto;padding:10px 16px 60px;}
+.card{
+  background:var(--bg);
+  border-radius:18px;
+  padding:22px;
+  margin-bottom:20px;
+  box-shadow:8px 8px 16px var(--shadow-dark),-8px -8px 16px var(--shadow-light);
+}
+.card h2{margin-top:0;color:var(--accent);font-size:1.1rem;}
+label{display:block;font-size:0.82rem;font-weight:600;margin:12px 0 6px;color:#444;}
+input[type=text],input[type=tel],input[type=password],select,textarea{
+  width:100%;
+  padding:12px 14px;
+  border:none;
+  border-radius:12px;
+  background:var(--bg);
+  box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light);
+  font-size:0.95rem;
+  color:var(--text);
+}
+button.btn{
+  border:none;
+  padding:13px 20px;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--accent2),#a97b1f);
+  color:#fff;
+  font-weight:700;
+  font-size:0.95rem;
+  cursor:pointer;
+  box-shadow:6px 6px 12px var(--shadow-dark),-6px -6px 12px var(--shadow-light);
+  margin-top:16px;
+  width:100%;
+}
+button.btn.secondary{background:linear-gradient(135deg,#7a8290,#555b66);}
+button.btn.danger{background:linear-gradient(135deg,var(--danger),#7a1c1c);}
+button.btn.small{width:auto;padding:8px 14px;font-size:0.8rem;margin:4px 4px 0 0;}
+.photo-box{margin-top:12px;text-align:center;}
+.photo-box img{max-width:140px;border-radius:12px;box-shadow:4px 4px 10px var(--shadow-dark);}
+.qr-result{text-align:center;padding:10px;}
+#qrcode-canvas{margin:0 auto;background:#fff;padding:10px;border-radius:12px;display:inline-block;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px;}
+.stat{
+  padding:16px;
+  border-radius:14px;
+  text-align:center;
+  box-shadow:inset 4px 4px 8px var(--shadow-dark),inset -4px -4px 8px var(--shadow-light);
+}
+.stat .num{font-size:1.8rem;font-weight:800;color:var(--accent);}
+.stat .lbl{font-size:0.75rem;color:#555;margin-top:4px;}
+.reg-item{
+  padding:12px;border-radius:12px;margin-bottom:10px;
+  box-shadow:inset 3px 3px 6px var(--shadow-dark),inset -3px -3px 6px var(--shadow-light);
+  font-size:0.85rem;
+}
+.reg-item .name{font-weight:700;color:var(--accent);}
+.tag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:0.7rem;font-weight:700;color:#fff;margin-left:6px;}
+.tag.valid{background:var(--success);}
+.tag.pending{background:#999;}
+.hidden{display:none !important;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;}
+.switch{position:relative;width:52px;height:28px;}
+.switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#bbb;border-radius:28px;transition:0.2s;}
+.slider:before{position:absolute;content:"";height:22px;width:22px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:0.2s;}
+input:checked + .slider{background:var(--success);}
+input:checked + .slider:before{transform:translateX(24px);}
+#scanner-region{width:100%;border-radius:12px;overflow:hidden;}
+.result-box{margin-top:14px;padding:14px;border-radius:12px;}
+.result-box.ok{background:#d9f2e3;color:#1f5c34;}
+.result-box.bad{background:#f7d9d9;color:#7a1c1c;}
+.small-note{font-size:0.72rem;color:#777;margin-top:8px;}
+.search-bar{margin-bottom:14px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>ಕರ್ನಾಟಕ ರಾಜ್ಯ ಒಕ್ಕಲಿಗರ ದೈರಕ್ದರಿ ಟ್ರಸ್ಟ್ (ರಿ.)</h1>
+  <p>28ನೇ ವಾರ್ಷಿಕೋತ್ಸವ &amp; ಶ್ರೀಗುರು ಸಂಸ್ಮರಣೋತ್ಸವ — 20-09-2026</p>
+</div>
+
+<div class="nav">
+  <button class="navbtn active" data-tab="register">📝 Register</button>
+  <button class="navbtn" data-tab="gate">📷 Gate Check-in</button>
+  <button class="navbtn" data-tab="live">📊 Live Count</button>
+  <button class="navbtn" data-tab="adminlogin">🔐 Admin</button>
+</div>
+
+<div class="container">
+
+  <!-- REGISTER TAB -->
+  <div id="tab-register" class="tab">
+    <div class="card">
+      <h2>Event Registration</h2>
+      <div id="reg-form-area">
+        <label>Full Name *</label>
+        <input type="text" id="r-name" placeholder="Enter full name">
+
+        <label>Mobile / WhatsApp Number *</label>
+        <input type="tel" id="r-mobile" placeholder="10-digit mobile number" maxlength="10">
+
+        <label>Address *</label>
+        <textarea id="r-address" rows="2" placeholder="House / Street / Area"></textarea>
+
+        <label>District *</label>
+        <input type="text" id="r-district" placeholder="Enter district">
+
+        <label>City</label>
+        <input type="text" id="r-city" value="Bangalore">
+
+        <div id="photo-section" class="hidden">
+          <label>Photo (optional)</label>
+          <input type="file" id="r-photo" accept="image/*" capture="environment">
+          <div class="photo-box"><img id="r-photo-preview" class="hidden"></div>
+        </div>
+
+        <button class="btn" onclick="submitRegistration()">Register &amp; Generate QR</button>
+      </div>
+
+      <div id="reg-success" class="hidden qr-result">
+        <h2 style="color:var(--success)">✅ Registration Successful</h2>
+        <div id="qrcode-canvas"></div>
+        <p style="margin-top:12px;font-weight:700;" id="reg-name-display"></p>
+        <p class="small-note">Save this QR code (screenshot) — show it at the gate on event day.</p>
+        <button class="btn secondary small" onclick="downloadQR()">⬇ Download QR</button>
+        <button class="btn secondary small" onclick="resetRegForm()">Register Another</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GATE CHECK-IN TAB -->
+  <div id="tab-gate" class="tab hidden">
+    <div class="card">
+      <h2>Gate Scanner</h2>
+      <div id="gate-login-area">
+        <label>Gate Checker Password</label>
+        <input type="password" id="gate-pass" placeholder="Enter gate password">
+        <button class="btn" onclick="gateLogin()">Login</button>
+      </div>
+      <div id="gate-scan-area" class="hidden">
+        <div id="scanner-region"></div>
+        <button class="btn secondary small" onclick="restartScanner()">↻ Restart Scanner</button>
+        <div id="scan-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE COUNT TAB -->
+  <div id="tab-live" class="tab hidden">
+    <div class="card">
+      <h2>Live Event Count</h2>
+      <div class="stat-grid">
+        <div class="stat"><div class="num" id="stat-registered">0</div><div class="lbl">Total Registered</div></div>
+        <div class="stat"><div class="num" id="stat-checked">0</div><div class="lbl">Checked-in (QR)</div></div>
+        <div class="stat"><div class="num" id="stat-extra">0</div><div class="lbl">Extra Persons Added</div></div>
+        <div class="stat"><div class="num" id="stat-total">0</div><div class="lbl">Total Present</div></div>
+      </div>
+      <p class="small-note">Auto-refreshes every 5 seconds.</p>
+    </div>
+  </div>
+
+  <!-- ADMIN LOGIN TAB -->
+  <div id="tab-adminlogin" class="tab hidden">
+    <div class="card">
+      <h2>Admin Login</h2>
+      <label>Password</label>
+      <input type="password" id="admin-pass" placeholder="Enter admin password">
+      <button class="btn" onclick="adminLogin()">Login</button>
+      <p class="small-note">Default password: admin123 (change after first login is recommended in code).</p>
+    </div>
+  </div>
+
+  <!-- ADMIN DASHBOARD TAB -->
+  <div id="tab-admindash" class="tab hidden">
+    <div class="card">
+      <h2>Settings</h2>
+      <div class="toggle-row">
+        <span>Require / Allow Photo at Registration</span>
+        <label class="switch"><input type="checkbox" id="photo-toggle" onchange="togglePhotoSetting()"><span class="slider"></span></label>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="num" id="a-stat-registered">0</div><div class="lbl">Registered</div></div>
+        <div class="stat"><div class="num" id="a-stat-checked">0</div><div class="lbl">Checked-in</div></div>
+        <div class="stat"><div class="num" id="a-stat-total">0</div><div class="lbl">Total Present</div></div>
+        <div class="stat"><div class="num" id="a-stat-pending">0</div><div class="lbl">Pending</div></div>
+      </div>
+      <button class="btn secondary" onclick="logoutAdmin()">Logout</button>
+    </div>
+
+    <div class="card">
+      <h2>Registrations (Admin CRUD)</h2>
+      <input type="text" class="search-bar" id="admin-search" placeholder="Search by name / mobile / district" oninput="renderAdminList()">
+      <div id="admin-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+// Fill these later; falls back to localStorage automatically until filled in.
+const TURSO_URL = "https://state-vokkaliga-s-jagadish.aws-ap-south-1.turso.io/v2/pipeline";
+const TURSO_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODg5NTMzODIsImlkIjoiMDFhMDg1ZWQtOGIwMS03NDhhLTliNmUtYjAxM2M2MmU1NWFkIiwia2lkIjoiaGhYdXRxNE1DSm4xVFBPT0Nyd2FXOEFoXy1reGFCWmtjam8yVGhLaHJ6MCIsInJpZCI6IjhjNmY3NmJjLTY4YTgtNDhhMS1hZTcwLTNmYWQ4NGNmZWRjMSJ9.f3DSosfI_ktJ-DW_0Ax6hDr7glmRTgHE6hmZfmmy5iJL93LSwU6OGXtXCaY4LDaZjb0s37gKjopvVsbVI5GxBg";
+const USE_TURSO = TURSO_URL.length > 0 && TURSO_TOKEN.length > 0;
+
+const ADMIN_PASSWORD_HASH = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"; // sha256("admin123")
+const GATE_PASSWORD_HASH = "6b24e5790147c4d0b7c3bb98a92857c2c99e0e483c8787f23982b31b77f4cd20"; // sha256("gate123")
+
+/* ================= UTIL ================= */
+async function sha256(str){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function uuid(){
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c=>{
+    const r = Math.random()*16|0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+function nowISO(){ return new Date().toISOString(); }
+
+/* ================= TURSO HTTP PIPELINE ================= */
+async function tursoExec(sql, args=[]){
+  if(!USE_TURSO) return null;
+  const body = {
+    requests:[
+      {type:"execute", stmt:{sql:sql, args: args.map(a=>{
+        if(a===null || a===undefined) return {type:"null"};
+        if(typeof a === "number") return {type:"integer", value:String(a)};
+        return {type:"text", value:String(a)};
+      })}},
+      {type:"close"}
+    ]
+  };
+  const res = await fetch(TURSO_URL, {
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+TURSO_TOKEN},
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  return data;
+}
+
+async function initDB(){
+  if(!USE_TURSO) return;
+  await tursoExec(`CREATE TABLE IF NOT EXISTS registrations (
+    id TEXT PRIMARY KEY, name TEXT, mobile TEXT, address TEXT, district TEXT, city TEXT,
+    photo TEXT, created_at TEXT, checked_in INTEGER DEFAULT 0, checked_in_at TEXT,
+    extra_adults INTEGER DEFAULT 0, extra_kids INTEGER DEFAULT 0
+  )`);
+  await tursoExec(`CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)`);
+}
+
+/* ================= DATA LAYER (Turso or localStorage) ================= */
+function lsGetAll(){
+  return JSON.parse(localStorage.getItem("event_registrations")||"[]");
+}
+function lsSaveAll(list){
+  localStorage.setItem("event_registrations", JSON.stringify(list));
+}
+function lsGetSetting(key, def){
+  const s = JSON.parse(localStorage.getItem("event_settings")||"{}");
+  return key in s ? s[key] : def;
+}
+function lsSetSetting(key, val){
+  const s = JSON.parse(localStorage.getItem("event_settings")||"{}");
+  s[key] = val;
+  localStorage.setItem("event_settings", JSON.stringify(s));
+}
+
+async function dbInsertRegistration(reg){
+  if(USE_TURSO){
+    await tursoExec(
+      `INSERT INTO registrations (id,name,mobile,address,district,city,photo,created_at,checked_in,checked_in_at,extra_adults,extra_kids) VALUES (?,?,?,?,?,?,?,?,0,NULL,0,0)`,
+      [reg.id,reg.name,reg.mobile,reg.address,reg.district,reg.city,reg.photo||"",reg.created_at]
+    );
+  } else {
+    const list = lsGetAll();
+    list.push(reg);
+    lsSaveAll(list);
+  }
+}
+
+async function dbGetAll(){
+  if(USE_TURSO){
+    const data = await tursoExec(`SELECT id,name,mobile,address,district,city,photo,created_at,checked_in,checked_in_at,extra_adults,extra_kids FROM registrations ORDER BY created_at DESC`);
+    try{
+      const rows = data.results[0].response.result.rows;
+      return rows.map(r=>({
+        id:r[0].value,name:r[1].value,mobile:r[2].value,address:r[3].value,district:r[4].value,
+        city:r[5].value,photo:r[6].value,created_at:r[7].value,
+        checked_in:Number(r[8].value||0),checked_in_at:r[9].value,
+        extra_adults:Number(r[10].value||0),extra_kids:Number(r[11].value||0)
+      }));
+    }catch(e){ return []; }
+  } else {
+    return lsGetAll();
+  }
+}
+
+async function dbGetById(id){
+  const all = await dbGetAll();
+  return all.find(r=>r.id===id) || null;
+}
+
+async function dbUpdateRegistration(id, fields){
+  if(USE_TURSO){
+    const keys = Object.keys(fields);
+    const setClause = keys.map(k=>`${k}=?`).join(",");
+    await tursoExec(`UPDATE registrations SET ${setClause} WHERE id=?`, [...keys.map(k=>fields[k]), id]);
+  } else {
+    const list = lsGetAll();
+    const idx = list.findIndex(r=>r.id===id);
+    if(idx>-1){ list[idx] = {...list[idx], ...fields}; lsSaveAll(list); }
+  }
+}
+
+async function dbDeleteRegistration(id){
+  if(USE_TURSO){
+    await tursoExec(`DELETE FROM registrations WHERE id=?`,[id]);
+  } else {
+    const list = lsGetAll().filter(r=>r.id!==id);
+    lsSaveAll(list);
+  }
+}
+
+async function dbGetSetting(key, def){
+  if(USE_TURSO){
+    const data = await tursoExec(`SELECT value FROM settings WHERE key=?`,[key]);
+    try{
+      const rows = data.results[0].response.result.rows;
+      if(rows.length) return rows[0][0].value;
+      return def;
+    }catch(e){ return def; }
+  } else {
+    return lsGetSetting(key, def);
+  }
+}
+async function dbSetSetting(key, val){
+  if(USE_TURSO){
+    await tursoExec(`INSERT INTO settings (key,value) VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value`,[key,val]);
+  } else {
+    lsSetSetting(key, val);
+  }
+}
+
+/* ================= NAV ================= */
+document.querySelectorAll(".navbtn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".navbtn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    document.querySelectorAll(".tab").forEach(t=>t.classList.add("hidden"));
+    document.getElementById("tab-"+btn.dataset.tab).classList.remove("hidden");
+    if(btn.dataset.tab==="live") refreshLiveCount();
+    if(btn.dataset.tab==="register") applyPhotoSetting();
+  });
+});
+
+/* ================= REGISTRATION ================= */
+document.getElementById("r-photo")?.addEventListener("change", function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    document.getElementById("r-photo-preview").src = ev.target.result;
+    document.getElementById("r-photo-preview").classList.remove("hidden");
+  };
+  reader.readAsDataURL(file);
+});
+
+async function applyPhotoSetting(){
+  const enabled = await dbGetSetting("photo_enabled", "false");
+  document.getElementById("photo-section").classList.toggle("hidden", enabled !== "true");
+}
+
+async function submitRegistration(){
+  const name = document.getElementById("r-name").value.trim();
+  const mobile = document.getElementById("r-mobile").value.trim();
+  const address = document.getElementById("r-address").value.trim();
+  const district = document.getElementById("r-district").value.trim();
+  const city = document.getElementById("r-city").value.trim() || "Bangalore";
+
+  if(!name || !mobile || !address || !district){
+    alert("Please fill Name, Mobile, Address and District."); return;
+  }
+  if(!/^\d{10}$/.test(mobile)){
+    alert("Please enter a valid 10-digit mobile number."); return;
+  }
+
+  let photoData = "";
+  const preview = document.getElementById("r-photo-preview");
+  if(preview && !preview.classList.contains("hidden")){
+    photoData = preview.src;
+  }
+
+  const reg = {
+    id: uuid(),
+    name, mobile, address, district, city,
+    photo: photoData,
+    created_at: nowISO(),
+    checked_in: 0, checked_in_at:null,
+    extra_adults:0, extra_kids:0
+  };
+
+  await dbInsertRegistration(reg);
+
+  document.getElementById("reg-form-area").classList.add("hidden");
+  document.getElementById("reg-success").classList.remove("hidden");
+  document.getElementById("reg-name-display").innerText = name + " — " + mobile;
+
+  document.getElementById("qrcode-canvas").innerHTML = "";
+  new QRCode(document.getElementById("qrcode-canvas"), {
+    text: reg.id,
+    width:200, height:200
+  });
+  window._lastQR = reg.id;
+}
+
+function downloadQR(){
+  const canvas = document.querySelector("#qrcode-canvas canvas");
+  if(!canvas) return;
+  const link = document.createElement("a");
+  link.download = "event_qr_"+(window._lastQR||"code")+".png";
+  link.href = canvas.toDataURL();
+  link.click();
+}
+
+function resetRegForm(){
+  document.getElementById("reg-form-area").classList.remove("hidden");
+  document.getElementById("reg-success").classList.add("hidden");
+  ["r-name","r-mobile","r-address","r-district"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("r-city").value="Bangalore";
+  const preview = document.getElementById("r-photo-preview");
+  if(preview){ preview.src=""; preview.classList.add("hidden"); }
+  const photoInput = document.getElementById("r-photo");
+  if(photoInput) photoInput.value = "";
+}
+
+/* ================= GATE CHECK-IN ================= */
+let html5QrCode = null;
+
+async function gateLogin(){
+  const pass = document.getElementById("gate-pass").value;
+  const hash = await sha256(pass);
+  if(hash === GATE_PASSWORD_HASH || hash === ADMIN_PASSWORD_HASH){
+    document.getElementById("gate-login-area").classList.add("hidden");
+    document.getElementById("gate-scan-area").classList.remove("hidden");
+    startScanner();
+  } else {
+    alert("Incorrect password.");
+  }
+}
+
+function startScanner(){
+  if(html5QrCode) return;
+  html5QrCode = new Html5Qrcode("scanner-region");
+  html5QrCode.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: 220 },
+    onScanSuccess,
+    ()=>{}
+  ).catch(err=>{
+    document.getElementById("scan-result").innerHTML =
+      '<div class="result-box bad">Camera access failed: '+err+'</div>';
+  });
+}
+
+function restartScanner(){
+  if(html5QrCode){
+    html5QrCode.stop().then(()=>{
+      html5QrCode = null;
+      document.getElementById("scan-result").innerHTML = "";
+      startScanner();
+    }).catch(()=>{ html5QrCode=null; startScanner(); });
+  } else {
+    startScanner();
+  }
+}
+
+async function onScanSuccess(decodedText){
+  if(html5QrCode){
+    html5QrCode.pause(true);
+  }
+  const reg = await dbGetById(decodedText.trim());
+  const resultDiv = document.getElementById("scan-result");
+
+  if(!reg){
+    resultDiv.innerHTML = '<div class="result-box bad">❌ Invalid QR code. Not found in registrations.</div>';
+    setTimeout(()=>{ if(html5QrCode) html5QrCode.resume(); }, 2500);
+    return;
+  }
+
+  const alreadyIn = reg.checked_in === 1 || reg.checked_in === "1";
+
+  resultDiv.innerHTML = `
+    <div class="result-box ${alreadyIn ? 'bad' : 'ok'}">
+      <strong>${alreadyIn ? '⚠ Already Checked-in' : '✅ Valid Registration'}</strong><br>
+      Name: ${reg.name}<br>
+      Mobile: ${reg.mobile}<br>
+      District: ${reg.district} | City: ${reg.city}<br>
+      ${alreadyIn ? "Checked-in at: "+reg.checked_in_at : ""}
+    </div>
+    <label>Extra Adults (from his side)</label>
+    <input type="text" id="extra-adults-input" value="${reg.extra_adults||0}">
+    <label>Extra Kids (from his side)</label>
+    <input type="text" id="extra-kids-input" value="${reg.extra_kids||0}">
+    <button class="btn" onclick="confirmCheckin('${reg.id}')">Mark Valid & Save</button>
+    <button class="btn secondary small" onclick="restartScanner()">Scan Next</button>
+  `;
+}
+
+async function confirmCheckin(id){
+  const adults = parseInt(document.getElementById("extra-adults-input").value)||0;
+  const kids = parseInt(document.getElementById("extra-kids-input").value)||0;
+  await dbUpdateRegistration(id, {
+    checked_in: 1,
+    checked_in_at: nowISO(),
+    extra_adults: adults,
+    extra_kids: kids
+  });
+  document.getElementById("scan-result").innerHTML = '<div class="result-box ok">✅ Marked valid & saved. Ready to scan next.</div>';
+  setTimeout(restartScanner, 1500);
+}
+
+/* ================= LIVE COUNT ================= */
+async function refreshLiveCount(){
+  const all = await dbGetAll();
+  const registered = all.length;
+  const checkedInList = all.filter(r=> r.checked_in===1 || r.checked_in==="1");
+  const checked = checkedInList.length;
+  const extra = checkedInList.reduce((sum,r)=> sum + (parseInt(r.extra_adults)||0) + (parseInt(r.extra_kids)||0), 0);
+  const total = checked + extra;
+
+  document.getElementById("stat-registered").innerText = registered;
+  document.getElementById("stat-checked").innerText = checked;
+  document.getElementById("stat-extra").innerText = extra;
+  document.getElementById("stat-total").innerText = total;
+
+  document.getElementById("a-stat-registered").innerText = registered;
+  document.getElementById("a-stat-checked").innerText = checked;
+  document.getElementById("a-stat-total").innerText = total;
+  document.getElementById("a-stat-pending").innerText = registered - checked;
+}
+setInterval(()=>{
+  if(!document.getElementById("tab-live").classList.contains("hidden")) refreshLiveCount();
+  if(!document.getElementById("tab-admindash").classList.contains("hidden")) refreshLiveCount();
+}, 5000);
+
+/* ================= ADMIN ================= */
+async function adminLogin(){
+  const pass = document.getElementById("admin-pass").value;
+  const hash = await sha256(pass);
+  if(hash === ADMIN_PASSWORD_HASH){
+    sessionStorage.setItem("isAdmin","true");
+    document.querySelectorAll(".tab").forEach(t=>t.classList.add("hidden"));
+    document.getElementById("tab-admindash").classList.remove("hidden");
+    document.querySelectorAll(".navbtn").forEach(b=>b.classList.remove("active"));
+    await loadAdminSettings();
+    await renderAdminList();
+    refreshLiveCount();
+  } else {
+    alert("Incorrect admin password.");
+  }
+}
+
+function logoutAdmin(){
+  sessionStorage.removeItem("isAdmin");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.add("hidden"));
+  document.getElementById("tab-register").classList.remove("hidden");
+  document.querySelectorAll(".navbtn").forEach(b=>b.classList.remove("active"));
+  document.querySelector('.navbtn[data-tab="register"]').classList.add("active");
+}
+
+async function loadAdminSettings(){
+  const enabled = await dbGetSetting("photo_enabled","false");
+  document.getElementById("photo-toggle").checked = (enabled === "true");
+}
+
+async function togglePhotoSetting(){
+  const enabled = document.getElementById("photo-toggle").checked;
+  await dbSetSetting("photo_enabled", enabled ? "true" : "false");
+}
+
+let allRegCache = [];
+async function renderAdminList(){
+  allRegCache = await dbGetAll();
+  const query = (document.getElementById("admin-search")?.value || "").toLowerCase();
+  const filtered = allRegCache.filter(r=>
+    r.name.toLowerCase().includes(query) ||
+    r.mobile.includes(query) ||
+    (r.district||"").toLowerCase().includes(query)
+  );
+  const listDiv = document.getElementById("admin-list");
+  if(filtered.length === 0){
+    listDiv.innerHTML = "<p class='small-note'>No registrations found.</p>";
+    return;
+  }
+  listDiv.innerHTML = filtered.map(r=>{
+    const checkedIn = r.checked_in===1 || r.checked_in==="1";
+    return `
+    <div class="reg-item">
+      <span class="name">${r.name}</span>
+      <span class="tag ${checkedIn?'valid':'pending'}">${checkedIn?'CHECKED-IN':'PENDING'}</span><br>
+      📱 ${r.mobile} | 📍 ${r.district}, ${r.city}<br>
+      🏠 ${r.address}<br>
+      ${checkedIn ? `👥 Extra Adults: ${r.extra_adults||0} | Kids: ${r.extra_kids||0} | At: ${r.checked_in_at}` : ""}
+      <div>
+        <button class="btn small secondary" onclick="editReg('${r.id}')">✏ Edit</button>
+        <button class="btn small danger" onclick="deleteReg('${r.id}')">🗑 Delete</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+async function deleteReg(id){
+  if(!confirm("Delete this registration permanently?")) return;
+  await dbDeleteRegistration(id);
+  await renderAdminList();
+  refreshLiveCount();
+}
+
+async function editReg(id){
+  const reg = allRegCache.find(r=>r.id===id);
+  if(!reg) return;
+  const newName = prompt("Name:", reg.name); if(newName===null) return;
+  const newMobile = prompt("Mobile:", reg.mobile); if(newMobile===null) return;
+  const newAddress = prompt("Address:", reg.address); if(newAddress===null) return;
+  const newDistrict = prompt("District:", reg.district); if(newDistrict===null) return;
+  const newCity = prompt("City:", reg.city); if(newCity===null) return;
+  await dbUpdateRegistration(id, {name:newName, mobile:newMobile, address:newAddress, district:newDistrict, city:newCity});
+  await renderAdminList();
+}
+
+/* ================= INIT ================= */
+window.addEventListener("load", async ()=>{
+  await initDB();
+  await applyPhotoSetting();
+});
+</script>
+</body>
+</html>
