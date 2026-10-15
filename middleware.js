@@ -17,16 +17,24 @@ async function sign(s) {
 }
 
 // true = valid, false = rejected, null = license server unreachable
+let dbg = '';
 async function check(key, host) {
   try {
+    if (!process.env.LICENSE_API) { dbg = 'LICENSE_API is not set'; return null; }
+    if (!process.env.VERIFY_SECRET) { dbg = 'VERIFY_SECRET is not set'; return null; }
     const r = await fetch(process.env.LICENSE_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-verify-secret': process.env.VERIFY_SECRET },
       body: JSON.stringify({ key, host })
     });
-    if (!r.ok) return null;
+    if (!r.ok) {
+      let d = '';
+      try { const j = await r.json(); d = (j.reason || '') + ' ' + (j.detail || ''); } catch (e) {}
+      dbg = 'HTTP ' + r.status + ' ' + d.trim();
+      return null;
+    }
     return (await r.json()).valid === true;
-  } catch (e) { return null; }
+  } catch (e) { dbg = String(e.message || e); return null; }
 }
 
 async function cookieFor(key) {
@@ -69,7 +77,7 @@ export default async function middleware(req) {
     if (ok === true) {
       return new Response(null, { status: 303, headers: { Location: '/', 'Set-Cookie': setCookie(await cookieFor(key)) } });
     }
-    return gate(ok === null ? 'License server unreachable. Try again shortly.' : 'This key is not valid for this site.');
+    return gate(ok === null ? 'License server unreachable. Try again shortly.' + (process.env.LICENSE_DEBUG === '1' ? ' [' + dbg + ']' : '') : 'This key is not valid for this site.');
   }
 
   // Existing session cookie
